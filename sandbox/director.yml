@@ -1,50 +1,19 @@
 az-configuration:
 - name: AZ1
-  iaas_configuration_name: vcsa-01
   clusters:
   - cluster: Cluster
-    drs_rule: MUST
-    guid: b462a4c08e6ce12b6a84
-    host_group: null
-    resource_pool: null
-  guid: 231b67f89608631321ae
+    resource_pool: pas-az1
+  iaas_configuration_guid: 
 - name: AZ2
-  iaas_configuration_name: vcsa-01
   clusters:
   - cluster: Cluster
-    drs_rule: MUST
-    guid: f2abcb63b2a6efe8451d
-    host_group: null
-    resource_pool: null
-  guid: 60ebd9a9158a394fb50e
+    resource_pool: pas-az2
+  iaas_configuration_guid: 
 - name: AZ3
-  iaas_configuration_name: vcsa-01
   clusters:
   - cluster: Cluster
-    drs_rule: MUST
-    guid: ebac2c680d697ba99c29
-    host_group: null
-    resource_pool: null
-  guid: 5dce35f8353cb8de5bc7
-iaas-configurations:
-- additional_cloud_properties: {}
-  bosh_disk_path: ((iaas-configurations_0_bosh_disk_path))
-  bosh_template_folder: ((iaas-configurations_0_bosh_template_folder))
-  bosh_vm_folder: ((iaas-configurations_0_bosh_vm_folder))
-  datacenter: ((iaas-configurations_0_datacenter))
-  disk_type: ((iaas-configurations_0_disk_type))
-  ephemeral_datastores_string: ((iaas-configurations_0_ephemeral_datastores_string))
-  name: ((iaas-configurations_0_name))
-  nsx_address: ((iaas-configurations_0_nsx_address))
-  nsx_ca_certificate: ((iaas-configurations_0_nsx_ca_certificate))
-  nsx_mode: ((iaas-configurations_0_nsx_mode))
-  nsx_networking_enabled: ((iaas-configurations_0_nsx_networking_enabled))
-  nsx_t_auth_type: ((iaas-configurations_0_nsx_t_auth_type))
-  nsx_username: ((iaas-configurations_0_nsx_username))
-  persistent_datastores_string: ((iaas-configurations_0_persistent_datastores_string))
-  ssl_verification_enabled: ((iaas-configurations_0_ssl_verification_enabled))
-  vcenter_host: ((iaas-configurations_0_vcenter_host))
-  vcenter_username: ((iaas-configurations_0_vcenter_username))
+    resource_pool: pas-az3
+  iaas_configuration_guid: 
 network-assignment:
   network:
     name: PAS-Infrastructure
@@ -65,14 +34,35 @@ networks-configuration:
       - AZ1
       - AZ2
       - AZ3
+  - name: PAS-Deployment
+    subnets:
+    - iaas_identifier: PAS-Deployment
+      cidr: 192.168.2.0/24
+      dns: 10.192.2.10
+      gateway: 192.168.2.1
+      reserved_ip_ranges: ""
+      availability_zone_names:
+      - AZ1
+      - AZ2
+      - AZ3
+  - name: PAS-Services
+    subnets:
+    - iaas_identifier: PAS-Services
+      cidr: 192.168.3.0/24
+      dns: 10.192.2.10
+      gateway: 192.168.3.1
+      reserved_ip_ranges: ""
+      availability_zone_names:
+      - AZ1
+      - AZ2
+      - AZ3
 properties-configuration:
   director_configuration:
+    allow_legacy_agents: true
     blobstore_type: local
-    bosh_director_recreate_on_next_deploy: false
     bosh_recreate_on_next_deploy: false
     bosh_recreate_persistent_disks_on_next_deploy: false
     database_type: internal
-    director_metrics_server_enabled: true
     director_worker_count: 5
     encryption:
       keys: []
@@ -82,59 +72,60 @@ properties-configuration:
     hm_pager_duty_options:
       enabled: false
     identification_tags: {}
-    job_configuration_on_tmpfs: false
     keep_unreachable_vms: false
     local_blobstore_options:
-      enable_signed_urls: true
-    metrics_server_enabled: true
-    ntp_servers_string: ntp1.svc.pivotal.io
+      tls_enabled: true
+    ntp_servers_string: time.svc.pivotal.io
     post_deploy_enabled: false
-    resurrector_enabled: false
+    resurrector_enabled: true
     retry_bosh_deploys: false
-    skip_director_drain: false
-    system_metrics_runtime_enabled: true
+    skip_director_drain: true
   dns_configuration:
     excluded_recursors: []
     handlers: []
-  security_configuration: 
+  iaas_configuration:
+    additional_cloud_properties: {}
+    bosh_disk_path: pcf_disk
+    bosh_template_folder: pcf_templates
+    bosh_vm_folder: pcf_vms
+    datacenter: Datacenter
+    disk_type: thin
+    ephemeral_datastores_string: LUN01
+    guid: fa7e89c5ef5f72b16b8a
+    name: default
+    nsx_address: nsxmgr-01.haas-239.pez.pivotal.io
+    nsx_ca_certificate: ((nsx_ca_cert.certificate))
+    nsx_mode: nsx-t
+    nsx_networking_enabled: true
+    nsx_username: admin
+    nsx_password: ((nsx_password))
+    persistent_datastores_string: LUN01
+    ssl_verification_enabled: false
+    vcenter_host: vcsa-01.haas-239.pez.pivotal.io
+    vcenter_username: Administrator@vsphere.local
+    vcenter_password: ((vcenter_password))
+  security_configuration:
     trusted_certificates: ((my_ca.certificate))
     generate_vm_passwords: true
     opsmanager_root_ca_trusted_certs: true
-    generate_vm_passwords: ((properties-configuration_security_configuration_generate_vm_passwords))
-    opsmanager_root_ca_trusted_certs: false
   syslog_configuration:
     enabled: false
 resource-configuration:
   compilation:
-    additional_networks: []
-    additional_vm_extensions: []
+    instances: automatic
     instance_type:
       id: automatic
-    instances: automatic
-    nsx:
-      lbs: []
-      security_groups: []
-    nsxt:
-      lb:
-        server_pools: []
-      ns_groups: []
-    swap_as_percent_of_memory_size: automatic
   director:
-    additional_networks: []
-    additional_vm_extensions: []
-    instance_type:
-      id: automatic
     instances: automatic
-    nsx:
-      lbs: []
-      security_groups: []
-    nsxt:
-      lb:
-        server_pools: []
-      ns_groups: []
     persistent_disk:
       size_mb: automatic
-    swap_as_percent_of_memory_size: automatic
-vmextensions-configuration: []
-vmtypes-configuration: {}
-
+    instance_type:
+      id: automatic
+vmextensions-configuration:
+- name: router-extension
+  cloud_properties:
+    nsxt:
+      lb:
+        server_pools:
+        - name: PAS-GoRouter443ServerPool
+          port: 443
