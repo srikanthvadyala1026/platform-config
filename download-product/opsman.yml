@@ -4,3 +4,7 @@ pivnet-file-glob: "ops-manager-vsphere-*.ova"
 pivnet-product-slug: ops-manager
 product-version-regex: ^2\.10\..*$
 blobstore-bucket: ((s3.bucket_name))
+s3-access-key-id: ((s3.access_key))
+s3-secret-access-key: ((s3.secret_key))
+s3-endpoint: ((s3.address))
+s3-region-name: region
