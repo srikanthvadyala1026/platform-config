@@ -128,4 +128,4 @@ vmextensions-configuration:
       lb:
         server_pools:
         - name: PAS-GoRouter443ServerPool
-          port: 443
+          #port: 443
